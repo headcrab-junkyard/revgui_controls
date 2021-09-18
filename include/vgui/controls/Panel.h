@@ -1,6 +1,6 @@
 /*
  * This file is part of VGUI2
- * Copyright (C) 2019-2020 BlackPhrase
+ * Copyright (C) 2019-2021 BlackPhrase
  *
  * VGUI2 is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,40 +20,35 @@
 
 #pragma once
 
-#include "vgui2/IClientPanel.h"
+#include <vector>
+
+#include <vgui2/IClientPanel.h>
+#include <vgui2/IScheme.h>
+#include <vgui2/MouseCode.h>
+
+#include <Color.h>
+
+//class CUtlVector;
+
+template<typename T>
+using CUtlVector = std::vector<T>; // TODO: temp
 
 namespace vgui2
 {
 
+class BaseTooltip;
+
 /*
 	Panel(Panel *apParent, const char *asName, IScheme::Handle anScheme);
-	
-	virtual void DeletePanel();
-	
-	void SetName(const char *asName);
-	
-	virtual void SetVisible(bool abState);
-	virtual bool IsVisible() const;
 	
 	virtual void SetParent(Panel *apParent);
 	virtual Panel *GetParent() const;
 	
-	int GetChildCount() const;
-	Panel *GetChild(int anIndex) const;
-	
 	Panel *FindChildByName(const char *asName, bool abRecurseDown = false);
-	
-	virtual void SetCursor(CursorHandle_t anCursor);
-	virtual CursorHandle_t GetCursor() const;
-	
-	virtual bool HasFocus() const;
 	
 	// Scheme access
 	virtual void SetScheme(IScheme::Handle anScheme);
 	virtual IScheme::Handle GetScheme() const;
-	
-	// Message handlers
-	virtual void OnThink();
 	
 	// Input messages
 	virtual void OnCursorEntered();
@@ -74,61 +69,234 @@ public: // IClientPanel interface implementation
 	/// @return pointer to Panel's vgui VPanel interface handle
 	VPANEL GetVPanel() override {return mnPanel;}
 	
-	void Think() override;
-	
-	void PerformApplySchemeSettings() override;
-	
-	void PaintTraverse(bool bForceRepaint, bool bAllowForce) override;
+	void PaintTraverse(bool abForceRepaint, bool abAllowForce) override;
 	
 	void Repaint() override;
 	
-	VPANEL IsWithinTraverse(int x, int y, bool bTraversePopups) override;
+	void SetBuildModeEditable(bool abEditable);
+	bool IsEditModeEditable() const;
 	
-	void GetInset(int &top, int &left, int &right, int &bottom) override;
-	void GetClipRect(int &x0, int &y0, int &x1, int &y1) override;
+	virtual VPANEL IsWithinTraverse(int x, int y, bool abTraversePopups) override;
 	
-	void OnChildAdded(VPANEL nChild) override;
-	void OnSizeChanged(int nNewWide, int nNewTall) override;
+	virtual void GetInset(int &top, int &left, int &right, int &bottom) override;
+	virtual void GetClipRect(int &x0, int &y0, int &x1, int &y1) override;
 	
-	void InternalFocusChanged(bool bLost) override;
+	/// Called when a child has been added to this panel
+	virtual void OnChildAdded(VPANEL anChild) override;
 	
-	bool RequestInfo(KeyValues *pOutputData) override;
+	/// Called after the size of a panel has been changed
+	virtual void OnSizeChanged(int anNewWidth, int anNewHeight) override;
 	
-	void RequestFocus(int nDirection = 0) override;
-	bool RequestFocusPrev(VPANEL nExistingPanel) override;
-	bool RequestFocusNext(VPANEL nExistingPanel) override;
+	void InternalFocusChanged(bool abLost) override;
 	
-	void OnMessage(const KeyValues *pParams, VPANEL nFromPanel) override;
+	bool RequestInfo(KeyValues *apOutputData) override;
 	
-	VPANEL GetCurrentKeyFocus() override;
+	virtual void RequestFocus(int anDirection = 0) override;
+	virtual bool RequestFocusPrev(VPANEL anExistingPanel = 0) override;
+	virtual bool RequestFocusNext(VPANEL anExistingPanel = 0) override;
 	
-	int GetTabPosition() override;
+	/// Called when panel receives message, must chain back
+	virtual void OnMessage(const KeyValues *apParams, VPANEL anFromPanel) override;
 	
+	virtual VPANEL GetCurrentKeyFocus() override;
+	
+	virtual int GetTabPosition() override;
+	
+	/// @return the name of this panel (never returns a nullptr)
 	const char *GetName() override;
+	
+	/// @return the class name of the panel (example: Panel, Label, Button, etc)
 	const char *GetClassName() override;
 	
-	HScheme GetScheme() override;
+	virtual HScheme GetScheme() override;
 	
-	bool IsProportional() override;
-	bool IsAutoDeleteSet() override;
+	virtual bool IsProportional() override; // TODO {return mFlags.IsFlagSet(IS_PROPORTIONAL);}
+	virtual bool IsAutoDeleteSet() override;
 	
-	void DeletePanel() override;
+	/// Deletes itself
+	virtual void DeletePanel() override {delete this;}
 	
 	void *QueryInterface(EInterfaceID nId) override;
-	Panel *GetPanel() override {return this;}
-	const char *GetModuleName() override;
-private:
-	void Init(int anPosX, int anPosY, int anWidth, int anHeight);
 	
-	void SetParent(Panel *apParent);
-	Panel *GetParent() const {return mpParent;}
+	/// @return the name of the module that this instance of panel was compiled into
+	virtual const char *GetModuleName() override;
+public: // Rest of the methods
+	virtual void Init(int anPosX, int anPosY, int anWidth, int anHeight);
 	
+	/// Sets the name of the panel - used as an identifier
 	void SetName(const char *asName){msName = asName;}
 	
-	void SetScheme(HScheme ahScheme){mhScheme = ahScheme;}
+	// Drawing state
+	virtual void SetEnabled(bool abState);
+	virtual bool IsEnabled() const;
 	
+	/// Has a parent, but is in it's own space
+	virtual bool IsPopup() const;
+	
+	virtual void MoveToFront();
+	
+	// Panel visibility
+	// Invisible panels and their children won't be drawn, updated or receive input msgs
+	virtual void SetVisible(bool abState);
+	virtual bool IsVisible() const;
+	
+	virtual void SetProportional(bool abState);
+	
+	/// Object will free its memory next tick
+	virtual void MarkForDeletion();
+	
+	/// If set to true, panel automatically frees itself when parent is deleted
+	virtual void SetAutoDelete(bool abState);
+	
+	virtual void SetTabPosition(int anPos);
+	
+	/// Sets alpha modifier for panel and all child panels [0...255]
+	void SetAlpha(int anAlpha);
+	
+	/// @return the current alpha
+	int GetAlpha() const;
+	
+	// Scheme access methods
+	virtual void SetScheme(const char *asTag);
+	virtual void SetScheme(HScheme ahScheme){mhScheme = ahScheme;}
+	
+	virtual void SetCursor(HCursor ahCursor){mhCursor = ahCursor;} // TODO: HCursor -> CursorHandle_t?
+	virtual HCursor GetCursor() const {return mhCursor;} // TODO: HCursor -> CursorHandle_t?
+	
+	/// Combination of SetPos/SetSize
+	void SetBounds(int anPosX, int anPosY, int anWidth, int anHeight);
+	
+	/// Combination of GetPos/GetSize
+	void GetBounds(int &anPosX, int &anPosY, int &anWidth, int &anHeight) const;
+	
+	virtual void SetBorder(IBorder *apBorder);
+	virtual IBorder *GetBorder() const;
+	
+	virtual void SetPaintBorderEnabled(bool abState);
+	virtual void SetPaintBackgroundEnabled(bool abState);
+	virtual void SetPaintEnabled(bool abState);
+	virtual void SetPostChildPaintEnabled(bool abState);
+	
+	/// 0 for normal (opaque), 1 for single texture from Texture1, and 2 for rounded box w/ four corner textures
+	// TODO
+	virtual void SetPaintBackgroundType(int anType);
+	
+	// Panel position & size
+	// NOTE: all units are in pixels
+	
+	/// Sets position of the panel in local space (relative to parent's pos)
 	void SetPos(int anPosX, int anPosY);
+	
+	/// Gets local position of the panel
+	void GetPos(int &anPosX, int &anPosY) const;
+	
+	int GetXPos() const;
+	int GetYPos() const;
+	
+	/// Sets Z-ordering - lower numbers are always behind higher Z's
+	void SetZPos(int anPosZ);
+	int GetZPos() const;
+	
 	void SetSize(int anWidth, int anHeight);
+	void GetSize(int &anWidth, int &anHeight) const;
+	
+	void SetMinimumSize(int anWidth, int anHeight);
+	void GetMinimumSize(int &anWidth, int &anHeight) const;
+	
+	void SetWidth(int anWidth);
+	int GetWidth() const;
+	
+	void SetHeight(int anHeight);
+	int GetHeight() const;
+	
+	//
+	
+	// Panel hierarchy
+	virtual void SetParent(Panel *apParent);
+	virtual void SetParent(VPANEL anParent);
+	virtual Panel *GetParent() const {return mpParent;}
+	virtual VPANEL GetVParent() const;
+	virtual bool HasParent(VPANEL anPotentialParent) const;
+	
+	int GetChildCount() const;
+	virtual CUtlVector<VPANEL> &GetChildren() const;
+	Panel *GetChild(int anIndex) const;
+	
+	//
+	
+	virtual bool HasFocus() const;
+	
+	// Interface to build settings
+	// Takes a group of settings and applies them to the control
+	virtual void ApplySettings(const KeyValues *apSettings);
+	
+	// Records the settings into the resource data
+	virtual void GetSettings(KeyValues *apSettings) const;
+	
+	void SetTooltip(BaseTooltip *apTooltip, const char *asText);
+	
+	/// @return a pointer to the tooltip object associated with the panel
+	/// Creates a new one if none exists yet
+	BaseTooltip *GetTooltip() const;
+	
+	// Message handlers
+	
+	/// Called every frame before painting, but only if panel is visible
+	virtual void OnThink();
+	
+	// Message handlers that don't go through the msg pump
+	virtual void PaintBackground();
+	virtual void Paint();
+	virtual void PaintBorder();
+	virtual void PaintBuildOverlay();
+	
+	virtual void PostChildPaint();
+	virtual void PerformLayout();
+public: // Navigation public interface
+	enum class NavDirection : int
+	{
+		Up,
+		Down,
+		Left,
+		Right,
+		Back,
+		None
+	};
+public: // Drag & drop public interface
+	virtual void SetDragEnabled(bool abEnabled);
+	virtual bool IsDragEnabled() const;
+	
+	virtual void SetShowDragHelper(bool abEnabled);
+	
+	virtual void SetDropEnabled(bool abEnabled, float afHoverContextTime = 0.0f);
+	virtual bool IsDropEnabled() const;
+protected: // Drag & drop internal interface
+	virtual void OnStartDragging();
+	virtual void OnContinueDragging();
+	virtual void OnFinishDragging(bool abMouseReleased, MouseCode aeCode, bool abAborted = false);
+	
+	virtual void DragDropStartDragging();
+	
+	virtual void CreateDragData();
+	virtual void GetDragData(CUtlVector<KeyValues*> &avList) const;
+protected:
+	Panel *GetNavUpPanel() const;
+	Panel *GetNavDownPanel() const;
+	Panel *GetNavLeftPanel() const;
+	Panel *GetNavRightPanel() const;
+	Panel *GetNavToRelayPanel() const;
+	Panel *GetNavActivatePanel() const;
+	Panel *GetNavBackPanel() const;
+protected:
+	NavDirection meLastNavDir{};
+	
+	bool mbPassUnhandledInput{false};
+private: // Private IClientPanel overrides
+	Panel *GetPanel() override {return this;}
+	
+	void Think() override;
+	
+	void PerformApplySchemeSettings() override;
 private:
 	VPANEL mnPanel{};
 	
@@ -137,6 +305,9 @@ private:
 	const char *msName{""};
 	
 	HScheme mhScheme{};
+	HCursor mhCursor{};
+	
+	bool mbAutoDelete{false};
 private:
 	//IVGui *mpVGUI{nullptr};
 	//IPanel *mpPanelManager{nullptr};

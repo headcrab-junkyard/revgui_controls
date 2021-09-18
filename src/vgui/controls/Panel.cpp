@@ -1,6 +1,6 @@
 /*
  * This file is part of VGUI2
- * Copyright (C) 2020 BlackPhrase
+ * Copyright (C) 2020-2021 BlackPhrase
  *
  * VGUI2 is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 
 /// @file
 
-#include "Panel.hpp"
+#include "Panel.h"
 
 namespace vgui2
 {
@@ -70,6 +70,7 @@ void Panel::Repaint()
 
 VPANEL Panel::IsWithinTraverse(int x, int y, bool bTraversePopups)
 {
+	return 0;
 };
 
 void Panel::GetInset(int &top, int &left, int &right, int &bottom)
@@ -94,18 +95,26 @@ void Panel::InternalFocusChanged(bool bLost)
 
 bool Panel::RequestInfo(KeyValues *pOutputData)
 {
+	if(pOutputData)
+	{
+		return true;
+	};
+	
+	return false;
 };
 
-void Panel::RequestFocus(int nDirection = 0)
+void Panel::RequestFocus(int nDirection)
 {
 };
 
 bool Panel::RequestFocusPrev(VPANEL nExistingPanel)
 {
+	return false;
 };
 
 bool Panel::RequestFocusNext(VPANEL nExistingPanel)
 {
+	return false;
 };
 
 void Panel::OnMessage(const KeyValues *pParams, VPANEL nFromPanel)
@@ -114,10 +123,12 @@ void Panel::OnMessage(const KeyValues *pParams, VPANEL nFromPanel)
 
 VPANEL Panel::GetCurrentKeyFocus()
 {
+	return 0;
 };
 
 int Panel::GetTabPosition()
 {
+	return 0;
 };
 
 const char *Panel::GetName()
@@ -135,32 +146,28 @@ const char *Panel::GetClassName()
 
 HScheme Panel::GetScheme()
 {
-};
-
-bool Panel::IsProportional()
-{
+	return 0;
 };
 
 bool Panel::IsAutoDeleteSet()
 {
-};
-
-void Panel::DeletePanel()
-{
+	return false;
 };
 
 void *Panel::QueryInterface(EInterfaceID nId)
 {
+	return nullptr;
 };
 
 const char *Panel::GetModuleName()
 {
+	return "";
 };
 
 void Panel::Init(int anPosX, int anPosY, int anWidth, int anHeight)
 {
 	mnPanel = gpVGUI->AllocPanel();
-	gpPanelWrapper->Init(mnPanel, this);
+	GetPanelWrapper()->Init(mnPanel, this);
 	
 	SetPos(anPosX, anPosY);
 	SetSize(anWidth, anHeight);
