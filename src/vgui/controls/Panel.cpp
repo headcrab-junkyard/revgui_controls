@@ -19,6 +19,7 @@
 /// @file
 
 #include "Panel.h"
+#include "Controls.h"
 
 namespace vgui2
 {
@@ -48,7 +49,7 @@ Panel::~Panel()
 {
 	SetParent(reinterpret_cast<VPANEL>(nullptr));
 	
-	gpVGUI->FreePanel(mnPanel);
+	CVGUIProvider::GetVGUI()->FreePanel(mnPanel);
 	mnPanel = 0;
 };
 
@@ -166,8 +167,8 @@ const char *Panel::GetModuleName()
 
 void Panel::Init(int anPosX, int anPosY, int anWidth, int anHeight)
 {
-	mnPanel = gpVGUI->AllocPanel();
-	GetPanelWrapper()->Init(mnPanel, this);
+	mnPanel = CVGUIProvider::GetVGUI()->AllocPanel();
+	CVGUIProvider::GetPanelWrapper()->Init(mnPanel, this);
 	
 	SetPos(anPosX, anPosY);
 	SetSize(anWidth, anHeight);
