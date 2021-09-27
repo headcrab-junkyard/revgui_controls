@@ -7,6 +7,8 @@
 namespace vgui2
 {
 
+class TextImage;
+
 class Slider : public Panel
 {
 	DECLARE_CLASS_SIMPLE(Slider, Panel);
@@ -93,7 +95,7 @@ protected:
 	
 	bool mbDragging{false};
 	
-	bool mbInverted{false} : 1;
+	bool mbInverted : 1 {false};
 };
 
 }; // namespace vgui2

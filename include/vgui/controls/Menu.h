@@ -7,6 +7,8 @@
 namespace vgui2
 {
 
+class MenuItem;
+
 class Menu : public Panel
 {
 	DECLARE_CLASS_SIMPLE(Menu, Panel);

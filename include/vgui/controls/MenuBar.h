@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <tier1/utlvector.h>
+
 #include "Panel.h"
 
 namespace vgui2

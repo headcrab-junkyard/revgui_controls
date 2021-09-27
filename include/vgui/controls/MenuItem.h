@@ -7,6 +7,9 @@
 namespace vgui2
 {
 
+class Menu;
+//class TextImage;
+
 class MenuItem : public Button
 {
 	DECLARE_CLASS_SIMPLE(MenuItem, Button);

@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include <Color.h>
+
 #include "vgui2/IImage.h"
 
 namespace vgui2

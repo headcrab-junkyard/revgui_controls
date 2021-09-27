@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <vgui2/VGUI.h>
+
 #include "Panel.h"
 
 namespace vgui2

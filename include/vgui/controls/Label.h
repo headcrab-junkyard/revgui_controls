@@ -9,6 +9,8 @@
 namespace vgui2
 {
 
+class TextImage;
+
 class Label : public Panel
 {
 	DECLARE_CLASS_SIMPLE(Label, Panel);
