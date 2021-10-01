@@ -1,19 +1,19 @@
 /*
- * This file is part of VGUI2
+ * This file is part of revgui_controls
  * Copyright (C) 2020-2021 BlackPhrase
  *
- * VGUI2 is free software: you can redistribute it and/or modify
+ * revgui_controls is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * VGUI2 is distributed in the hope that it will be useful,
+ * revgui_controls is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with VGUI2. If not, see <http://www.gnu.org/licenses/>.
+ * along with revgui_controls. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /// @file
