@@ -1,6 +1,6 @@
 /*
  * This file is part of revgui_controls
- * Copyright (C) 2020-2021 BlackPhrase
+ * Copyright (C) 2020-2021, 2024 BlackPhrase
  *
  * revgui_controls is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,6 +17,7 @@
  */
 
 /// @file
+/// @brief Thin line used to divide sections, can be moved dragged!
 
 #pragma once
 
@@ -32,14 +33,47 @@ class Splitter : public EditablePanel
 {
 	DECLARE_CLASS_SIMPLE(Splitter, EditablePanel);
 public:
-	Splitter(Panel *apParent, const char *asName, SplitterMode_t aeMode, int anCount);
+	enum class Mode : int
+	{
+		Horizontal = 0,
+		Vertical
+	};
+	
+	/// anCount is the number of splitters to create
+	/// NOTE: The constructor here will create (anCount + 1) EditablePanel chilren
+	/// and name them child0...childN for .res file purposes
+	Splitter(Panel *apParent, const char *asName, Mode aeMode, int anCount);
+	
 	~Splitter();
 	
+	/// Evenly respace all splitters
 	void EvenlyRespaceSplitters();
 	
+	/// Respace splitters using given fractions (must sum to 1)
 	void RespaceSplitters(float *afFractions);
+public: // Inherited from Panel
+	/*virtual*/ void ApplySettings(KeyValues *apSettings);
+	/*virtual*/ void GetSettings(KeyValues *apSettings);
+	
+	/*virtual*/ void PerformLayout();
+	
+	/*virtual*/ void OnSizeChanged(int anNewWidth, int anNewHeight);
+	
+	/*virtual*/ void ApplyUserConfigSettings(KeyValues *apUserConfig);
+	/*virtual*/ void GetUserConfigSettings(KeyValues *apUserConfig);
+	/*virtual*/ bool HasUserConfigSettings() const {return true;}
+public:
+	// Sets the splitter color
+	void SetSplitterColor(Color aColor);
+	
+	/// Enables borders on the splitters
+	void EnableBorders(bool abEnable);
+	
+	/// Locks the size of a particular child in pixels
+	void LockChildSize(int anChildIndex, int anSize);
+	void UnlockChildSize(int anChildIndex);
 private:
-	void RecreateSplitter(int anCount);
+	void RecreateSplitters(int anCount);
 	
 	int GetPosRange() const;
 	
@@ -52,9 +86,23 @@ private:
 	
 	int ComputeLockedSize(int anStartingIndex);
 private:
-	CUtlVector<SplitterInfo_t> mvSplitters;
+	struct SplitterInfo
+	{
+		SplitterChildPanel *mpPanel{nullptr}; ///< This panel is to the left or above the handle
+		SplitterHandle *mpHandle{nullptr};
+		
+		float mfPos{0.0f};
+		
+		int mnLockedSize{0};
+		
+		bool mbLocked{false};
+	};
 	
-	SplitterMode_t meMode{};
+	CUtlVector<SplitterInfo> mvSplitters;
+	
+	Mode meMode{};
+	
+	friend class SplitterHandle;
 };
 
 }; // namespace vgui2

@@ -1,6 +1,6 @@
 /*
  * This file is part of revgui_controls
- * Copyright (C) 2020-2021 BlackPhrase
+ * Copyright (C) 2020-2021, 2024 BlackPhrase
  *
  * revgui_controls is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -40,6 +40,11 @@ public:
 	/*virtual*/ void SetText(const wchar_t *asText, bool abClearUnlocalizedSymbol = false);
 	/*virtual*/ void GetText(wchar_t *apBuffer, int anLength);
 protected:
+	/// Truncate the text string to fit into the draw width
+	void SizeText(wchar_t *asTempText, int anStringLen);
+	
+	/// Gets the size of a specified piece of text
+	/*virtual*/ void GetTextSize(int &anWidth, int &anHeight);
 private:
 	void RecalculateEllipsesPosition();
 private:

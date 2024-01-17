@@ -23,7 +23,7 @@
 
 #include <Color.h>
 
-#include "vgui2/IImage.h"
+#include <vgui2/IImage.h>
 
 namespace vgui2
 {
@@ -59,9 +59,14 @@ protected:
 	virtual void Paint() = 0;
 private:
 	Color mColor{};
+	Color mBgColor{};
+	
+	HTexture mhTextureID{-1};
 	
 	int mvPos[2]{};
 	int mvSize[2]{};
+	
+	int mnRotation{0};
 };
 
 }; // namespace vgui2

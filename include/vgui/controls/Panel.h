@@ -1,6 +1,6 @@
 /*
  * This file is part of revgui_controls
- * Copyright (C) 2019-2021 BlackPhrase
+ * Copyright (C) 2019-2022 BlackPhrase
  *
  * revgui_controls is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -292,11 +292,16 @@ protected:
 	
 	bool mbPassUnhandledInput{false};
 private: // Private IClientPanel overrides
-	Panel *GetPanel() override {return this;}
+	/*virtual*/ Panel *GetPanel() override {return this;}
 	
 	void Think() override;
 	
 	void PerformApplySchemeSettings() override;
+private: // Other private methods
+	//void Init(int anX, int anY, int anWidth, int anHeight); // TODO: public?
+	
+	void InternalPerformLayout();
+	void InternalSetCursor();
 private:
 	VPANEL mnPanel{};
 	

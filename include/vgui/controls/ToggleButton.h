@@ -1,6 +1,6 @@
 /*
  * This file is part of revgui_controls
- * Copyright (C) 2020-2021 BlackPhrase
+ * Copyright (C) 2020-2021, 2024 BlackPhrase
  *
  * revgui_controls is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,9 +32,14 @@ class ToggleButton : public Button
 {
 	DECLARE_CLASS_SIMPLE(ToggleButton, Button);
 public:
-	ToggleButton(Panel *apParent, const char *asName, const char *asText);
+	ToggleButton(Panel *apParent, const char *asPanelName, const char *asText);
 	
 	/*virtal*/ void DoClick();
+	
+	/* Messages sent (get via AddActionSignalTarget() method):
+		"ButtonToggled"
+			int "state"
+	*/
 protected:
 	// Overrides
 	/*virtual*/ void OnMouseDoublePressed(MouseCode aeCode);
