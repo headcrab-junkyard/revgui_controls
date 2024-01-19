@@ -1,6 +1,6 @@
 /*
  * This file is part of revgui_controls
- * Copyright (C) 2020-2021 BlackPhrase
+ * Copyright (C) 2020-2021, 2024 BlackPhrase
  *
  * revgui_controls is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,6 +27,11 @@
 
 namespace vgui2
 {
+
+// Prevent Windows macros from messing with the class
+//#ifdef ProgressBox
+//#	undef ProgressBox
+//#endif
 
 class ProgressBox : public Frame
 {
@@ -58,6 +63,12 @@ public:
 	/// Toggle the enabled state of the cancel button
 	/// (in case it needs to be disabled partway through a process)
 	/*virtual*/ void SetCancelButtonEnabled(bool abState);
+	
+	/* Custom messages:
+	
+		"ProgressBoxCancelled"
+			sent if the user pressed the cancel button (must be enabled & visible for this to happen)
+	*/
 protected:
 	/*virtual*/ void PerformLayout();
 	

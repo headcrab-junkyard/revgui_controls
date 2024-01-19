@@ -1,6 +1,6 @@
 /*
  * This file is part of revgui_controls
- * Copyright (C) 2020-2021 BlackPhrase
+ * Copyright (C) 2020-2021, 2024 BlackPhrase
  *
  * revgui_controls is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,9 +23,14 @@
 #include "TextImage.h"
 #include "ToggleButton.h"
 
+//#include <vgui/VGUI.h>
+
+//class RadioImage;
+
 namespace vgui2
 {
 
+// TODO: wrong place? remove from here?
 /// Radio button image
 class RadioImage : public TextImage
 {
@@ -46,27 +51,38 @@ private:
 	RadioButton *mpButton{nullptr};
 };
 
+/// Radio buttons are automatically selected into groups by who their parent is
+/// At most one radio button is active at any time
 class RadioButton : public ToggleButton
 {
 	DECLARE_CLASS_SIMPLE(RadioButton, ToggleButton);
 public:
-	RadioButton(Panel *apParent, const char *asName, const char *asText);
+	RadioButton(Panel *apParent, const char *asPanelName, const char *asText);
 	~RadioButton();
 	
+	/// Set the radio button checked. When a radio button is checked,
+	/// a message is sent to all other radio buttons in the same group so
+	/// they will become unchecked
 	/*virtual*/void SetSelected(int abState);
 	
 	/*virtual*/ void SetSubTabPosition(int anPosition);
+	
+	/// Get the tab position of the radio button with the set of radio buttons
+	/// A group of RadioButtons must have the same TabPosition, with [1, n] sub-TabPositions
 	/*virtual*/int GetSubTabPosition() const;
 	
+	/// Return the RadioButton's real tab position (its Panel one changes)
 	/*virtual*/ int GetRadioTabPosition() const;
 	
-	/*virtual*/ void SilentSetSelected(bool abState);
+	/*virtual*/ void SilentSetSelected(bool abState); // TODO: where from?
 protected:
 	/*virtual*/ void DoClick();
 	
 	/*virtual*/ void Paint() override;
 	
 	/*virtual*/ void ApplySchemeSettings(IScheme *apScheme);
+	
+	MESSAGE_FUNC_INT(OnRadioButtonChecked, "RadioButtonChecked", nTabPosition);
 	
 	/*virtual*/ void OnKeyCodeTyped(KeyCode aeCode);
 	

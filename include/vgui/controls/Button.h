@@ -39,6 +39,7 @@ public:
 	/*virtual*/ void SetArmed(bool abState);
 	/*virtual*/ bool IsArmed() const;
 protected:
+	/// Override this to draw different focus border
 	/*virtual*/ void DrawFocusBorder(int anX0, int anY0, int anX1, int anY1);
 	
 	/// Paint button on screen
@@ -66,7 +67,7 @@ protected:
 	
 	void PlayButtonReleasedSound();
 protected:
-	CUtlFlags<unsigned short> mvButtonFlags;
+	CUtlFlags<unsigned short> mvFlags;
 	
 	KeyValues *mpActionMessage{nullptr};
 	

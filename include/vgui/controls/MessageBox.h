@@ -1,6 +1,6 @@
 /*
  * This file is part of revgui_controls
- * Copyright (C) 2020-2021 BlackPhrase
+ * Copyright (C) 2020-2021, 2024 BlackPhrase
  *
  * revgui_controls is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,15 +21,24 @@
 
 #pragma once
 
+//#include <vgui/VGUI.h>
 #include "Frame.h"
 
 namespace vgui2
 {
 
+// Prevent Window macros from messing with the class
+#ifdef MessageBox
+#	undef MessageBox
+#endif
+
 class MessageBox : public Frame
 {
 	DECLARE_CLASS_SIMPLE(MessageBox, Frame);
 public:
+	/// @param asTitle Text to be displayed in the title bar of the window
+	/// @param asText Text message in the message box
+	/// @param apParent Parent panel of the message box, by default it has no parent. This will keep the box visible until the OK button is pressed
 	MessageBox(const char *asTitle, const char *asText, Panel *apParent = nullptr
 	MessageBox(const wchar_t *asTitle, const wchar_t *asText, Panel *apParent = nullptr);
 	~MessageBox();
@@ -53,7 +62,9 @@ public:
 	/*virtual*/ void SetOKButtonText(const wchar_t *asText);
 	
 	/// Cancel button (disabled by default)
+	
 	void SetCancelButtonVisible(bool abState);
+	
 	void SetCancelButtonText(const char *asText);
 	void SetCancelButtonText(const wchar_t *asText);
 	
@@ -72,6 +83,7 @@ protected:
 protected:
 	Button *mpOkButton{nullptr};
 	Button *mpCancelButton{nullptr};
+	
 	Label *mpMessageLabel{nullptr};
 private:
 	void Init();
@@ -81,7 +93,7 @@ private:
 	KeyValues *mpOkCommand{nullptr};
 	KeyValues *mpCancelCommand{nullptr};
 	
-	Frame *mpFrameOver{nullptr};
+	vgui::Frame *mpFrameOver{nullptr};
 	
 	bool mbNoAutoClose{false} : 1;
 	bool mbShowMessageBoxOverCursor{false} : 1;
